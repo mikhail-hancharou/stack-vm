@@ -1,3 +1,6 @@
+/Stack-vm/out
+/Stack-vm/.vs
+
 # Prerequisites
 *.d
 
