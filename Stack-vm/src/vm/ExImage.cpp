@@ -1,4 +1,4 @@
-#include <iostream>
+#include <iomanip>
 #include "../../include/vm/Vm.h"
 
 using namespace vm;
@@ -139,14 +139,79 @@ void ExecutableImage::disassemble()
 	WORD opcode;
 	WORD previousOp = -1;
 	WORD ip = 0;
-	do 
+	while (ip < image.size())
 	{
 		opcode = image[ip];
-		if (opcode != OP_HALT) ip += printMnemomic(ip);
-		else {
-			if (previousOp != OP_HALT) printMnemomic(ip);
+		if (opcode != OP_HALT)
+		{
+			ip += printMnemomic(ip);
+		}
+		else 
+		{
+			if (previousOp != OP_HALT)
+			{
+				printMnemomic(ip);
+			}
 			ip++;
 		}
 		previousOp = opcode;
-	} while (ip < image.size());
+	}
+}
+
+// Prints instruction mnemonic
+WORD ExecutableImage::printMnemomic(WORD address) 
+{
+	WORD ip = address;
+	WORD opcode = image[ip++];
+	cout << "[" << setw(6) << address << "]    ";
+	switch (opcode) 
+	{
+		// ---------------------------
+		// STACK OPERATIONS
+	case OP_CONST:	cout << "iconst  " << image[ip++]; break;
+	case OP_PUSH:   cout << "ipush   [" << image[ip++] << "]"; break;
+	case OP_POP:    cout << "ipop    [" << image[ip++] << "]"; break;
+		// ---------------------------
+		// ARITHMETIC OPERATIONS
+	case OP_ADD:    cout << "iadd    "; break;
+	case OP_SUB:    cout << "isub    "; break;
+	case OP_MUL:    cout << "imul    "; break;
+	case OP_DIV:    cout << "idiv    "; break;
+		// ---------------------------
+		// BITWISE OPERATIONS
+	case OP_AND:    cout << "iand    "; break;
+	case OP_OR:     cout << "ior     "; break;
+	case OP_XOR:    cout << "ixor    "; break;
+	case OP_NOT:    cout << "inot    "; break;
+	case OP_SHL:    cout << "ishl    "; break;
+	case OP_SHR:    cout << "ishr    "; break;
+		// ---------------------------
+		// FLOW CONTROL OPERATIONS
+	case OP_JMP:    cout << "jmp     [" << showpos << image[ip++] << noshowpos << "]"; break;
+	case OP_IFZERO: cout << "ifzero  [" << showpos << image[ip++] << noshowpos << "]"; break;
+	case OP_EQUAL:  cout << "equal    "; break;
+	case OP_NEQUAL: cout << "nequal   "; break;
+	case OP_GREATER:cout << "greater  "; break;
+	case OP_GREQUAL:cout << "grequal  "; break;
+	case OP_LESS:   cout << "less     "; break;
+	case OP_LSEQUAL:cout << "lsequal  "; break;
+	case OP_LAND:   cout << "land  "; break;
+	case OP_LOR:    cout << "lor   "; break;
+	case OP_LNOT:   cout << "lnot  "; break;
+		// ---------------------------
+		// PROCEDURE CALL OPERATIONS
+	case OP_CALL:   cout << "call    [" << image[ip++] << "], " << image[ip++]; break;
+	case OP_RET:    cout << "ret     "; break;
+	case OP_SYSCALL:cout << "syscall 0x" << setbase(16) << image[ip++] << setbase(10); break;
+	case OP_HALT: 	cout << "---- halt ----"; break;
+		// ---------------------------
+		// LOCAL VARIABLES AND ARGUMENTS ACCESS OPERATIONS
+	case OP_LOAD:	cout << "iload   #" << image[ip++]; break;
+	case OP_STORE:	cout << "istore  #" << image[ip++]; break;
+	case OP_ARG:	cout << "iarg    #" << image[ip++]; break;
+	default:
+		cout << "0x" << setbase(16) << opcode << setbase(10);
+	}
+	cout << endl;
+	return ip - address;
 }

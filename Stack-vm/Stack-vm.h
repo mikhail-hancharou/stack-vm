@@ -4,5 +4,7 @@
 #pragma once
 
 #include <iostream>
+#include <chrono>
+#include "include/vm/Vm.h"
 
 // TODO: Reference additional headers your program requires here.
